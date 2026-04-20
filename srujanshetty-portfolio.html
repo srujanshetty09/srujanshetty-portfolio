@@ -1,0 +1,515 @@
+import { useState, useEffect, useRef } from "react";
+
+const theme = {
+  bg: "#0a1628", bg2: "#111e38", bg3: "#1c2143", card: "#132744",
+  accent: "#7ec8e3", text: "#e8edf3", muted: "#8899aa",
+  border: "rgba(126,200,227,0.15)", danger: "#e24b4a", success: "#40916c",
+};
+
+const nav = ["About","Experience","Projects","Skills","Certifications","Blog","Contact"];
+
+const experience = [
+  { title:"Senior IT Manager, Enterprise Technology & Digital Transformation", company:"Sobha Group (Sobha Furniture LLC | Sobha Realty Group)", industry:"Manufacturing & Real Estate", location:"Dubai, UAE", date:"Mar 2022 to Present", bullets:["Lead IT strategy across 8+ sites (UAE, Italy, Germany) under single Azure tenant with 5 legal entities","AED 100M+ cumulative IT investment portfolio. AED 36M annual budget. 20+ cross-functional team","Program Director for DIC ERP ARIELS: MSD 365 F&O across 5 legal entities","Built greenfield smart factory from ground zero: 16-app enterprise stack","ISO/IEC 27001:2022 security governance. ignITe Innovation Centre. Six Sigma. Impact Leadership Award, Sobha Excellence Awards 2025"]},
+  { title:"Group IT Manager", company:"Maatouk Factories LLC (Samira Maatouk Group)", industry:"FMCG / Coffee Production, F&B & Retail", location:"Abu Dhabi, UAE", date:"Mar 2020 to Mar 2022", bullets:["IT across 2 factories, 10+ F&B outlets, 40+ retail stores spanning UAE, Lebanon, Egypt","SAP B1 HANA ERP. iVend POS across 40+ outlets. Oracle Micros across F&B outlets","Built Data Centre from scratch. Warehouse management across 10+ locations"]},
+  { title:"Asst. IT Manager", company:"Nando's UAE LLC", industry:"F&B Franchise Retail (22 restaurants, pan-UAE)", location:"Dubai, UAE", date:"May 2017 to Feb 2020", bullets:["Full IT stack across 22 franchise outlets. Microsoft NAV + LS Retail POS","LS Retail Call Centre with AVAYA IPO. Zomato/Deliveroo POS integration","Office 365, CCTV, PCI-DSS compliance, cloud DR"]},
+  { title:"IT Project Lead / Business Consultant", company:"Triumph Technologies FZ LLC", industry:"Retail & Hospitality IT Solutions", location:"Dubai, UAE", date:"Apr 2015 to May 2017", bullets:["200+ POS implementations and 10+ data centre setups","Clients: Nando's, National Holdings, HOT Brands, Food Quest"]},
+  { title:"Project Engineer, IT Infrastructure", company:"BGT Ventures General Trading LLC", industry:"IT Infrastructure", location:"Dubai, UAE", date:"Jan 2014 to Mar 2015", bullets:["IT infrastructure projects across offices, factories, schools, universities"]},
+  { title:"IT System Administrator", company:"Western Union", industry:"Financial Services", location:"Hyderabad, India", date:"Jun 2011 to Jan 2014", bullets:["Foundation role. Active Directory, access controls, security implementation"]},
+];
+
+const projects = [
+  { name:"DIC ERP ARIELS", tag:"Sobha Group", year:"2024-2026", desc:"Enterprise-scale MSD 365 F&O implementation across 5 legal entities with Think Tribe Technologies. Phase 1 go-live Apr 2026, Phase 2 Jul 2026.", tech:["D365 F&O","Power BI","Azure","CRM","CPQ"], impact:"Unified ERP across 5 entities. End-to-end O2C architecture."},
+  { name:"Greenfield Smart Factory", tag:"Sobha Group", year:"2022-2024", desc:"Built IT infrastructure for a AED 60M joinery factory from ground zero. Data centre, OT network, IIoT machine connectivity, and 16-application enterprise stack.", tech:["IIoT","OT Network","Azure","Solidworks","Lectra","CMES/MES"], impact:"Complete greenfield to production-ready smart factory."},
+  { name:"SAP B1 + Multi-POS Ecosystem", tag:"Samira Maatouk Group", year:"2020-2022", desc:"End-to-end SAP B1 HANA ERP with iVend Retail POS across 40+ outlets and Oracle Micros across F&B outlets. Full data centre build.", tech:["SAP B1 HANA","iVend Retail","Oracle Micros","ManageEngine"], impact:"Unified ERP + POS across 40+ retail stores, 10+ F&B outlets, and 2 factories."},
+  { name:"Franchise IT & Call Centre", tag:"Nando's UAE", year:"2017-2020", desc:"Full IT transformation across 22 franchise outlets. Microsoft NAV ERP, LS Retail POS, call centre with AVAYA IPO, and Zomato/Deliveroo API integration.", tech:["Microsoft NAV","LS Retail","AVAYA","Zomato API","Deliveroo API","Power BI"], impact:"Among first UAE F&B online ordering integrations."},
+  { name:"Multi-Client POS & Data Centre Program", tag:"Triumph Technologies", year:"2015-2017", desc:"Managed 200+ POS implementations and 10+ data centre setups across retail and hospitality clients.", tech:["Oracle POS","Future POS","Oracle Micros","VMware","Veeam"], impact:"200+ POS terminals deployed. 10+ data centres built."},
+  { name:"Enterprise IT Infra & Security Practice", tag:"Triumph | BGT | Western Union", year:"2011-2017", desc:"Built 10+ data centres end-to-end. Multi-brand firewall deployments (Cisco, SonicWall, Fortinet). Hybrid on-prem and cloud architecture with seamless multi-application integration.", tech:["Cisco ASA","SonicWall","Fortinet","VMware","Hyper-V","Azure","AWS","Active Directory"], impact:"10+ data centres. Multi-brand firewall stack. Hybrid architecture across enterprises."},
+];
+
+const skills = {
+  "ERP Platforms":["D365 F&O","Business Central","SAP S/4HANA","SAP B1 HANA","Oracle NetSuite","Microsoft NAV"],
+  "POS & Retail":["Oracle Micros","LS Retail","iVend Retail","Future POS","Zomato/Deliveroo API"],
+  "CRM & Customer":["MSD Dynamics CRM","Salesforce","HubSpot","CPQ Architecture","O2C Design"],
+  "AI & Automation":["Microsoft Copilot","LLM & AI Agents","Power BI","Power Automate","Power Apps","Digital Twin"],
+  "Cloud & Infra":["Azure","AWS","Hybrid Cloud","VMware","Hyper-V","Veeam","Data Centre & DR"],
+  "Security":["ISO 27001","NIST","COBIT","PCI-DSS","IT Audit","Cybersecurity Governance"],
+  "Network":["Cisco","SonicWall","Fortinet","SD-WAN","VoIP/SIP","Structured Cabling"],
+  "ITSM & Contact Centre":["ServiceNow","ManageEngine","NICE CXone","Redbox","Avaya","Genesys"],
+};
+
+const defaultCerts = [
+  { name:"CISM", org:"ISACA", id:"#242690595" },
+  { name:"TOGAF 10 L1 & L2", org:"Open Group", id:"#195968" },
+  { name:"PMP", org:"PMI", id:"#D989889" },
+  { name:"MCSE", org:"Microsoft", id:"#13687291" },
+  { name:"ITIL v4", org:"PeopleCert", id:"#02362639" },
+  { name:"Six Sigma Green Belt", org:"DMAIC", id:"Completed" },
+  { name:"MSD 365 SCM Consultant", org:"Microsoft", id:"#MS0995619706" },
+];
+
+const blogs = [
+  { title:"Why Greenfield IT Setup Is the Ultimate Test of an IT Leader", desc:"Building a smart factory from zero taught me more about IT leadership than 10 years of managing existing systems.", tags:["Smart Factory","Leadership","IIoT"]},
+  { title:"AI Copilot in D365 F&O: Hype vs Reality", desc:"After hands-on experience preparing our D365 environment for Copilot, here's what's real, what's coming, and what's still marketing.", tags:["AI","D365 F&O","Copilot"]},
+  { title:"How to Spot Recruitment Scams Targeting Senior IT Professionals", desc:"Two scam approaches hit my inbox in one week. Here's the red flag checklist every UAE professional needs.", tags:["Cybersecurity","UAE","Career"]},
+];
+
+const stats = [
+  { num:"14+", label:"Years" }, { num:"AED 100M+", label:"Portfolio" },
+  { num:"6", label:"Countries" }, { num:"200+", label:"POS Deployed" },
+  { num:"20+", label:"Team Led" }, { num:"7", label:"Industries" },
+];
+
+export default function Portfolio() {
+  const [active, setActive] = useState("About");
+  const [projIdx, setProjIdx] = useState(null);
+  const [photo, setPhoto] = useState(null);
+  const [certImages, setCertImages] = useState({});
+  const [locked, setLocked] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [showLockConfirm, setShowLockConfirm] = useState(false);
+  const photoRef = useRef(null);
+  const certRef = useRef(null);
+  const [uploadingCert, setUploadingCert] = useState(null);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await window.storage.get("portfolio-data");
+        if (res && res.value) {
+          const d = JSON.parse(res.value);
+          if (d.photo) setPhoto(d.photo);
+          if (d.certImages) setCertImages(d.certImages);
+          if (d.locked) setLocked(true);
+        }
+      } catch(e) {}
+      setLoading(false);
+    }
+    load();
+  }, []);
+
+  async function save(p, ci, lk) {
+    try {
+      await window.storage.set("portfolio-data", JSON.stringify({ photo: p, certImages: ci, locked: lk }));
+    } catch(e) {}
+  }
+
+  function handlePhoto(e) {
+    if (locked) return;
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const url = ev.target.result;
+      setPhoto(url);
+      save(url, certImages, locked);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function handleCertImage(e, certName) {
+    if (locked) return;
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const url = ev.target.result;
+      const updated = { ...certImages, [certName]: url };
+      setCertImages(updated);
+      save(photo, updated, locked);
+      setUploadingCert(null);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function handleLock() {
+    setLocked(true);
+    setShowLockConfirm(false);
+    save(photo, certImages, true);
+  }
+
+  function handleUnlock() {
+    setLocked(false);
+    save(photo, certImages, false);
+  }
+
+  const s = {
+    wrap: { background: theme.bg, minHeight: "100vh", color: theme.text, fontFamily: "Tahoma, Geneva, sans-serif" },
+    nav: { background: theme.bg2, borderBottom: `1px solid ${theme.border}`, padding: "0 24px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 },
+    navBtn: (a) => ({ background: "none", border: "none", color: a ? theme.accent : theme.muted, fontSize: 13, padding: "14px 10px", cursor: "pointer", borderBottom: a ? `2px solid ${theme.accent}` : "2px solid transparent", fontWeight: a ? 600 : 400, fontFamily: "inherit" }),
+    section: { maxWidth: 900, margin: "0 auto", padding: "40px 24px" },
+    h2: { fontSize: 28, fontWeight: 700, color: theme.accent, marginBottom: 8 },
+    h3: { fontSize: 20, fontWeight: 600, color: "#fff", marginBottom: 4 },
+    sub: { fontSize: 14, color: theme.muted, marginBottom: 24 },
+    card: { background: theme.card, borderRadius: 10, padding: 20, marginBottom: 16, border: `1px solid ${theme.border}` },
+    tag: { display: "inline-block", background: "rgba(126,200,227,0.12)", color: theme.accent, fontSize: 11, padding: "3px 10px", borderRadius: 12, marginRight: 6, marginBottom: 4 },
+    btn: { background: theme.accent, color: theme.bg, border: "none", padding: "10px 24px", borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" },
+    btnDanger: { background: theme.danger, color: "#fff", border: "none", padding: "8px 20px", borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" },
+    btnSuccess: { background: theme.success, color: "#fff", border: "none", padding: "8px 20px", borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" },
+    btnOutline: { background: "none", color: theme.accent, border: `1px solid ${theme.accent}`, padding: "6px 16px", borderRadius: 6, fontSize: 12, cursor: "pointer", fontFamily: "inherit" },
+    uploadBar: { background: theme.bg3, border: `1px solid ${theme.border}`, borderRadius: 8, padding: "12px 20px", marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 },
+    lockedBadge: { display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(64,145,108,0.15)", color: theme.success, fontSize: 12, padding: "4px 12px", borderRadius: 12, fontWeight: 600 },
+  };
+
+  const Page = ({ children }) => <div style={s.section}>{children}</div>;
+
+  const UploadBar = () => {
+    if (locked) return (
+      <div style={{ ...s.uploadBar, justifyContent: "center" }}>
+        <span style={s.lockedBadge}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={theme.success} strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          Profile locked. Uploads disabled.
+        </span>
+        <button style={{ ...s.btnOutline, marginLeft: 12, color: theme.muted, borderColor: theme.muted, fontSize: 11 }} onClick={handleUnlock}>Unlock</button>
+      </div>
+    );
+    return (
+      <div style={s.uploadBar}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={theme.accent} strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <span style={{ fontSize: 13, color: theme.text }}>Upload your photo and cert images, then lock to finalise.</span>
+        </div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button style={s.btnOutline} onClick={() => photoRef.current?.click()}>
+            {photo ? "Change Photo" : "Upload Photo"}
+          </button>
+          <input ref={photoRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handlePhoto} />
+          <button style={s.btnDanger} onClick={() => setShowLockConfirm(true)}>Lock Profile</button>
+        </div>
+      </div>
+    );
+  };
+
+  const LockModal = () => {
+    if (!showLockConfirm) return null;
+    return (
+      <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ background: theme.bg2, borderRadius: 12, padding: 32, maxWidth: 420, border: `1px solid ${theme.border}`, textAlign: "center" }}>
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke={theme.danger} strokeWidth="1.5" style={{ marginBottom: 16 }}><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <h3 style={{ fontSize: 20, color: "#fff", marginBottom: 8 }}>Lock your profile?</h3>
+          <p style={{ fontSize: 14, color: theme.muted, marginBottom: 20, lineHeight: 1.6 }}>Once locked, photo and certification uploads will be disabled. You can unlock later if needed.</p>
+          <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+            <button style={{ ...s.btnOutline, color: theme.muted, borderColor: theme.muted }} onClick={() => setShowLockConfirm(false)}>Cancel</button>
+            <button style={s.btnDanger} onClick={handleLock}>Lock Profile</button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const About = () => (
+    <Page>
+      {/* Hero banner with tech pattern */}
+      <div style={{ background: `linear-gradient(135deg, ${theme.bg3}, ${theme.card})`, borderRadius: 16, padding: "40px 32px 32px", marginBottom: 24, position: "relative", overflow: "hidden", border: `1px solid ${theme.border}` }}>
+        {/* Decorative grid dots */}
+        <svg width="100%" height="100%" style={{ position: "absolute", top: 0, left: 0, opacity: 0.06 }}>
+          {Array.from({length: 20}).map((_, row) =>
+            Array.from({length: 30}).map((_, col) =>
+              <circle key={`${row}-${col}`} cx={col * 30 + 15} cy={row * 30 + 15} r="1.5" fill="#7ec8e3" />
+            )
+          )}
+        </svg>
+        {/* Decorative circuit lines */}
+        <svg width="100%" height="100%" style={{ position: "absolute", top: 0, left: 0, opacity: 0.08 }}>
+          <path d="M0 60 H120 V120 H200" stroke="#7ec8e3" strokeWidth="1" fill="none" />
+          <path d="M680 40 H580 V100 H500" stroke="#7ec8e3" strokeWidth="1" fill="none" />
+          <path d="M300 0 V40 H400 V80" stroke="#7ec8e3" strokeWidth="1" fill="none" />
+          <circle cx="120" cy="60" r="3" fill="#7ec8e3" />
+          <circle cx="200" cy="120" r="3" fill="#7ec8e3" />
+          <circle cx="580" cy="40" r="3" fill="#7ec8e3" />
+          <circle cx="500" cy="100" r="3" fill="#7ec8e3" />
+          <circle cx="300" cy="40" r="3" fill="#7ec8e3" />
+        </svg>
+        {/* Glowing orb decorations */}
+        <div style={{ position: "absolute", top: -40, right: -40, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle, rgba(126,200,227,0.08) 0%, transparent 70%)" }} />
+        <div style={{ position: "absolute", bottom: -60, left: -30, width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle, rgba(126,200,227,0.05) 0%, transparent 70%)" }} />
+
+        <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: 32 }}>
+          {/* Photo with ring */}
+          <div style={{ flexShrink: 0 }}>
+            <div style={{ width: 140, height: 140, borderRadius: "50%", padding: 4, background: `conic-gradient(${theme.accent}, ${theme.bg3}, ${theme.accent})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ width: 132, height: 132, borderRadius: "50%", background: theme.bg3, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", cursor: locked ? "default" : "pointer" }} onClick={() => !locked && photoRef.current?.click()}>
+                {photo ? <img src={photo} alt="Srujan Shetty" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  : <div style={{ textAlign: "center" }}>
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={theme.accent} strokeWidth="1.5"><path d="M12 16v-8M8 12l4-4 4 4"/><path d="M20 16.7V19a2 2 0 01-2 2H6a2 2 0 01-2-2v-2.3"/></svg>
+                      <p style={{ fontSize: 9, color: theme.muted, marginTop: 2 }}>Upload photo</p>
+                    </div>}
+              </div>
+            </div>
+          </div>
+          <input ref={photoRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handlePhoto} />
+
+          {/* Name & title */}
+          <div>
+            <p style={{ fontSize: 11, color: theme.accent, textTransform: "uppercase", letterSpacing: 3, marginBottom: 4 }}>Welcome to my portfolio</p>
+            <h1 style={{ fontSize: 34, fontWeight: 700, color: "#fff", marginBottom: 6, lineHeight: 1.1 }}>Srujan Shetty</h1>
+            <p style={{ fontSize: 17, color: theme.accent, marginBottom: 10 }}>Senior IT Manager | ERP & Digital Transformation Leader</p>
+            <p style={{ fontSize: 14, color: theme.muted, marginBottom: 14 }}>Enterprise Technology & IT Governance</p>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: theme.muted }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={theme.accent} strokeWidth="1.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg> Dubai, UAE
+              </span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: theme.muted }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={theme.accent} strokeWidth="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z M22 6l-10 7L2 6"/></svg> srujan1090@gmail.com
+              </span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: theme.muted }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={theme.accent} strokeWidth="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 013.12 4.18 2 2 0 015.11 2h3a2 2 0 012 1.72"/></svg> +971 55 236 5979
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats with icons */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 10, marginBottom: 24 }}>
+        {[
+          { num: "14+", label: "Years", icon: "M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" },
+          { num: "AED 100M+", label: "Portfolio", icon: "M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" },
+          { num: "6", label: "Countries", icon: "M12 2a10 10 0 110 20 10 10 0 010-20zM2 12h20M12 2a15 15 0 014 10 15 15 0 01-4 10 15 15 0 01-4-10A15 15 0 0112 2z" },
+          { num: "200+", label: "POS Deployed", icon: "M2 4h20v16H2zM2 10h20M8 4v16" },
+          { num: "20+", label: "Team Led", icon: "M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" },
+          { num: "7", label: "Industries", icon: "M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4" },
+        ].map((st, i) => (
+          <div key={i} style={{ textAlign: "center", background: theme.card, borderRadius: 10, padding: "14px 6px", border: `1px solid ${theme.border}`, transition: "transform 0.2s, border-color 0.2s", cursor: "default" }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.borderColor = theme.accent; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.borderColor = theme.border; }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={theme.accent} strokeWidth="1.5" style={{ marginBottom: 6 }}><path d={st.icon}/></svg>
+            <div style={{ fontSize: 18, fontWeight: 700, color: theme.accent }}>{st.num}</div>
+            <div style={{ fontSize: 9, color: theme.muted, textTransform: "uppercase", letterSpacing: 1, marginTop: 2 }}>{st.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* About text with side accent */}
+      <div style={{ ...s.card, borderLeft: `3px solid ${theme.accent}`, borderRadius: "0 10px 10px 0" }}>
+        <p style={{ fontSize: 11, color: theme.accent, textTransform: "uppercase", letterSpacing: 2, marginBottom: 10 }}>About Me</p>
+        <p style={{ fontSize: 14, lineHeight: 1.7, marginBottom: 12 }}>14+ years building IT ecosystems. From setting up server racks in Hyderabad to directing an AED 100M+ technology investment portfolio across three countries.</p>
+        <p style={{ fontSize: 14, lineHeight: 1.7, marginBottom: 12 }}>I started hands-on with cables, servers, Active Directory, and firewalls. That taught me something most IT leaders miss: you can't architect what you've never troubleshot. From there I moved into ERP, POS rollouts, franchise IT standardisation, and enterprise-scale strategy and governance.</p>
+        <p style={{ fontSize: 14, lineHeight: 1.7 }}>I lead with TOGAF for architecture. PMP for delivery. CISM for security. Six Sigma for process. But frameworks don't deliver outcomes. People do.</p>
+      </div>
+
+      {/* Industries with visual chips */}
+      <div style={{ marginTop: 20 }}>
+        <p style={{ fontSize: 11, color: theme.accent, textTransform: "uppercase", letterSpacing: 2, marginBottom: 10 }}>Industries Served</p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          {[
+            { name: "Manufacturing", icon: "M3 21h18M5 21V7l7-4 7 4v14" },
+            { name: "Real Estate", icon: "M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" },
+            { name: "Retail", icon: "M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0" },
+            { name: "F&B", icon: "M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3" },
+            { name: "FMCG", icon: "M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" },
+            { name: "Hospitality", icon: "M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z" },
+            { name: "Logistics", icon: "M1 3h15v13H1zM16 8h4l3 3v5h-7V8zM5.5 21a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM18.5 21a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" },
+          ].map((ind, i) => (
+            <div key={i} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(126,200,227,0.08)", border: `1px solid ${theme.border}`, borderRadius: 20, padding: "6px 14px", transition: "border-color 0.2s", cursor: "default" }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = theme.accent}
+              onMouseLeave={e => e.currentTarget.style.borderColor = theme.border}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={theme.accent} strokeWidth="1.5"><path d={ind.icon}/></svg>
+              <span style={{ fontSize: 12, color: theme.text }}>{ind.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Quick links */}
+      <div style={{ display: "flex", gap: 10, marginTop: 24 }}>
+        <button style={s.btn} onClick={() => setActive("Projects")}>View Projects</button>
+        <button style={{ ...s.btnOutline, padding: "10px 24px" }} onClick={() => setActive("Experience")}>Experience</button>
+        <a href="https://www.linkedin.com/in/srujan-shetty-12812758/" target="_blank" rel="noopener noreferrer" style={{ ...s.btnOutline, padding: "10px 24px", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={theme.accent} strokeWidth="1.5"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-4 0v7h-4v-7a6 6 0 016-6zM2 9h4v12H2zM4 2a2 2 0 110 4 2 2 0 010-4z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+    </Page>
+  );
+
+  const Experience = () => (
+    <Page>
+      <h2 style={s.h2}>Experience</h2>
+      <p style={s.sub}>14+ years across 6 organisations and 7 industries</p>
+      {experience.map((exp, i) => (
+        <div key={i} style={s.card}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap" }}>
+            <h3 style={{ ...s.h3, fontSize: 16 }}>{exp.title}</h3>
+            <span style={{ fontSize: 12, color: theme.accent }}>{exp.date}</span>
+          </div>
+          <p style={{ fontSize: 13, color: theme.accent, marginBottom: 2 }}>{exp.company}</p>
+          <p style={{ fontSize: 11, color: theme.muted, marginBottom: 8 }}>{exp.industry} | {exp.location}</p>
+          <ul style={{ paddingLeft: 16, margin: 0 }}>
+            {exp.bullets.map((b, j) => <li key={j} style={{ fontSize: 13, color: theme.text, marginBottom: 4, lineHeight: 1.5 }}>{b}</li>)}
+          </ul>
+        </div>
+      ))}
+    </Page>
+  );
+
+  const Projects = () => (
+    <Page>
+      <h2 style={s.h2}>Projects & Case Studies</h2>
+      <p style={s.sub}>Key technology programs delivered across my career</p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 16 }}>
+        {projects.map((p, i) => (
+          <div key={i} style={{ ...s.card, cursor: "pointer", border: projIdx === i ? `1px solid ${theme.accent}` : `1px solid ${theme.border}` }} onClick={() => setProjIdx(projIdx === i ? null : i)}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+              <span style={s.tag}>{p.tag}</span>
+              <span style={{ fontSize: 11, color: theme.muted }}>{p.year}</span>
+            </div>
+            <h3 style={{ ...s.h3, fontSize: 15, marginBottom: 8 }}>{p.name}</h3>
+            <p style={{ fontSize: 13, color: theme.muted, lineHeight: 1.5, marginBottom: 8 }}>{p.desc}</p>
+            {projIdx === i && (
+              <div style={{ borderTop: `1px solid ${theme.border}`, paddingTop: 10, marginTop: 6 }}>
+                <p style={{ fontSize: 12, fontWeight: 600, color: theme.accent, marginBottom: 4 }}>Impact</p>
+                <p style={{ fontSize: 13, color: theme.text, marginBottom: 8 }}>{p.impact}</p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                  {p.tech.map((t, j) => <span key={j} style={{ ...s.tag, fontSize: 10 }}>{t}</span>)}
+                </div>
+              </div>
+            )}
+            <p style={{ fontSize: 11, color: theme.accent, marginTop: 8 }}>{projIdx === i ? "Show less" : "View details"}</p>
+          </div>
+        ))}
+      </div>
+    </Page>
+  );
+
+  const Skills = () => (
+    <Page>
+      <h2 style={s.h2}>Technology Stack</h2>
+      <p style={s.sub}>Platforms, tools, and frameworks across my career</p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 16 }}>
+        {Object.entries(skills).map(([cat, items], i) => (
+          <div key={i} style={s.card}>
+            <h3 style={{ fontSize: 14, fontWeight: 600, color: theme.accent, marginBottom: 10 }}>{cat}</h3>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+              {items.map((sk, j) => <span key={j} style={{ ...s.tag, fontSize: 11 }}>{sk}</span>)}
+            </div>
+          </div>
+        ))}
+      </div>
+    </Page>
+  );
+
+  const Certifications = () => (
+    <Page>
+      <h2 style={s.h2}>Certifications</h2>
+      <p style={s.sub}>Professional credentials and governance qualifications</p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
+        {defaultCerts.map((c, i) => (
+          <div key={i} style={{ ...s.card, textAlign: "center", position: "relative" }}>
+            {certImages[c.name] ? (
+              <div style={{ marginBottom: 10 }}>
+                <img src={certImages[c.name]} alt={c.name} style={{ width: "100%", maxHeight: 120, objectFit: "contain", borderRadius: 6, border: `1px solid ${theme.border}` }} />
+              </div>
+            ) : (
+              <div style={{ width: 48, height: 48, borderRadius: "50%", background: "rgba(126,200,227,0.1)", border: `1px solid ${theme.accent}`, margin: "0 auto 10px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={theme.accent} strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12l3 3 5-6"/></svg>
+              </div>
+            )}
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 2 }}>{c.name}</h3>
+            <p style={{ fontSize: 12, color: theme.accent, marginBottom: 2 }}>{c.org}</p>
+            <p style={{ fontSize: 11, color: theme.muted, marginBottom: 8 }}>{c.id}</p>
+            {!locked && (
+              <button style={{ ...s.btnOutline, fontSize: 10, padding: "4px 10px" }} onClick={() => { setUploadingCert(c.name); }}>
+                {certImages[c.name] ? "Change image" : "Upload cert image"}
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+      {uploadingCert && !locked && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ background: theme.bg2, borderRadius: 12, padding: 32, maxWidth: 400, border: `1px solid ${theme.border}`, textAlign: "center" }}>
+            <h3 style={{ fontSize: 18, color: "#fff", marginBottom: 8 }}>Upload: {uploadingCert}</h3>
+            <p style={{ fontSize: 13, color: theme.muted, marginBottom: 16 }}>Select an image of your certificate (JPG, PNG, PDF screenshot)</p>
+            <input ref={certRef} type="file" accept="image/*" style={{ marginBottom: 16 }} onChange={(e) => handleCertImage(e, uploadingCert)} />
+            <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+              <button style={{ ...s.btnOutline, color: theme.muted, borderColor: theme.muted }} onClick={() => setUploadingCert(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+      <div style={{ ...s.card, marginTop: 24 }}>
+        <h3 style={{ ...s.h3, fontSize: 16, marginBottom: 8 }}>Education</h3>
+        <p style={{ fontSize: 14, color: theme.text, marginBottom: 4 }}><strong>M.Tech (CSE)</strong> Calorx Teachers University, India, 2012-2014</p>
+        <p style={{ fontSize: 14, color: theme.text, marginBottom: 4 }}><strong>B.Tech (CSE)</strong> JNTU Hyderabad, India, 2008-2012</p>
+        <p style={{ fontSize: 12, color: theme.muted, fontStyle: "italic" }}>Both certificates attested by UAE Embassy</p>
+      </div>
+      <div style={{ ...s.card, marginTop: 12 }}>
+        <h3 style={{ ...s.h3, fontSize: 16, marginBottom: 8 }}>Awards</h3>
+        <p style={{ fontSize: 14, color: theme.accent, marginBottom: 4 }}>Impact Leadership Award, Sobha Excellence Awards 2025</p>
+        <p style={{ fontSize: 14, color: theme.accent }}>Best IT Project Manager, Outstanding contribution to organisational growth</p>
+      </div>
+    </Page>
+  );
+
+  const Blog = () => (
+    <Page>
+      <h2 style={s.h2}>Thought Leadership</h2>
+      <p style={s.sub}>Insights on IT strategy, digital transformation, and industry trends</p>
+      {blogs.map((b, i) => (
+        <div key={i} style={s.card}>
+          <h3 style={{ ...s.h3, fontSize: 17, marginBottom: 8 }}>{b.title}</h3>
+          <p style={{ fontSize: 14, color: theme.muted, lineHeight: 1.6, marginBottom: 10 }}>{b.desc}</p>
+          <div style={{ display: "flex", gap: 6 }}>
+            {b.tags.map((t, j) => <span key={j} style={s.tag}>{t}</span>)}
+          </div>
+        </div>
+      ))}
+      <p style={{ fontSize: 13, color: theme.muted, marginTop: 16, fontStyle: "italic" }}>Full articles coming soon. Follow me on LinkedIn for updates.</p>
+    </Page>
+  );
+
+  const Contact = () => (
+    <Page>
+      <h2 style={s.h2}>Get in Touch</h2>
+      <p style={s.sub}>Open to connecting with leaders who believe technology should drive business outcomes</p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 16 }}>
+        {[
+          { label:"Email", val:"srujan1090@gmail.com", icon:"M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z M22 6l-10 7L2 6" },
+          { label:"Phone", val:"+971 55 236 5979", icon:"M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" },
+          { label:"Location", val:"Dubai, UAE", icon:"M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z M12 11.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" },
+          { label:"LinkedIn", val:"linkedin.com/in/srujan-shetty-12812758", icon:"M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z M2 9h4v12H2z M4 2a2 2 0 110 4 2 2 0 010-4z" },
+        ].map((c, i) => (
+          <div key={i} style={{ ...s.card, display: "flex", alignItems: "center", gap: 14 }}>
+            <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(126,200,227,0.1)", border: `1px solid ${theme.accent}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={theme.accent} strokeWidth="1.5"><path d={c.icon}/></svg>
+            </div>
+            <div>
+              <p style={{ fontSize: 11, color: theme.muted, textTransform: "uppercase", letterSpacing: 1 }}>{c.label}</p>
+              <p style={{ fontSize: 14, color: "#fff" }}>{c.val}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{ ...s.card, marginTop: 24, textAlign: "center" }}>
+        <p style={{ fontSize: 16, color: "#fff", marginBottom: 12 }}>I'm exploring how AI, LLMs, and intelligent automation reshape enterprise IT. Leaders who adapt early define the next era.</p>
+        <a href="https://www.linkedin.com/in/srujan-shetty-12812758/" target="_blank" rel="noopener noreferrer" style={{ ...s.btn, textDecoration: "none", display: "inline-block" }}>Connect on LinkedIn</a>
+      </div>
+    </Page>
+  );
+
+  const pages = { About, Experience, Projects, Skills, Certifications, Blog, Contact };
+  const ActivePage = pages[active];
+
+  if (loading) return <div style={{ ...s.wrap, display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh" }}><p style={{ color: theme.accent }}>Loading portfolio...</p></div>;
+
+  return (
+    <div style={s.wrap}>
+      <nav style={s.nav}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }} onClick={() => setActive("About")}>
+          {photo ? <img src={photo} alt="SS" style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover", border: `2px solid ${theme.accent}` }} /> : null}
+          <span style={{ fontSize: 18, fontWeight: 700, color: theme.accent, letterSpacing: 1 }}>Srujan Shetty</span>
+        </div>
+        <div style={{ display: "flex", gap: 4 }}>
+          {nav.map((n) => <button key={n} style={s.navBtn(active === n)} onClick={() => setActive(n)}>{n}</button>)}
+        </div>
+      </nav>
+      <UploadBar />
+      <LockModal />
+      <ActivePage />
+      <footer style={{ background: theme.bg2, borderTop: `1px solid ${theme.border}`, textAlign: "center", padding: 24, color: theme.muted, fontSize: 13 }}>
+        <p>Srujan Shetty | ERP & Digital Transformation Leader | Enterprise Technology & IT Governance</p>
+        <p style={{ marginTop: 4, fontSize: 11 }}>Dubai, UAE | srujan1090@gmail.com | +971 55 236 5979</p>
+      </footer>
+    </div>
+  );
+}
